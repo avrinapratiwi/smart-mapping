@@ -192,7 +192,7 @@ class _HalamanUtamaState extends State<HalamanUtama> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        'stupidmapping',
+                        'Smart Mapping',
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 17,
