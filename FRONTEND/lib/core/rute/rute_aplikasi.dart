@@ -7,6 +7,7 @@ import '../../features/data_petugas/data_petugas_halaman.dart';
 import '../../features/monitoring_progres/monitoring_progres_halaman.dart';
 import '../../features/halaman_utama.dart';
 import '../../features/halaman_login.dart';
+import '../../features/halaman_forget_password.dart';
 
 class RuteAplikasi {
   static final _rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -21,6 +22,10 @@ class RuteAplikasi {
       GoRoute(
         path: '/login',
         builder: (context, state) => const HalamanLogin(),
+      ),
+      GoRoute(
+        path: '/forget-password',
+        builder: (context, state) => const HalamanForgetPassword(),
       ),
       
       // ShellRoute digunakan agar Sidebar tetap diam, 

@@ -301,7 +301,7 @@ class _HalamanLoginState extends State<HalamanLogin> {
                     Align(
                       alignment: Alignment.centerRight,
                       child: TextButton(
-                        onPressed: () {},
+                        onPressed: () => context.go('/forget-password'),
                         style: TextButton.styleFrom(
                           foregroundColor: _kOrange,
                           padding: EdgeInsets.zero,
