@@ -6,6 +6,7 @@ import '../../features/direktori_usaha/direktori_usaha.dart';
 import '../../features/data_petugas/data_petugas_halaman.dart';
 import '../../features/monitoring_progres/monitoring_progres_halaman.dart';
 import '../../features/halaman_utama.dart';
+import '../../features/halaman_login.dart';
 
 class RuteAplikasi {
   static final _rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -14,8 +15,14 @@ class RuteAplikasi {
   static final GoRouter router = GoRouter(
     navigatorKey: _rootNavigatorKey,
     // Rute awal yang dibuka
-    initialLocation: '/dashboard',
+    initialLocation: '/login',
     routes: [
+      // Rute Login (diluar ShellRoute agar tidak ada sidebar)
+      GoRoute(
+        path: '/login',
+        builder: (context, state) => const HalamanLogin(),
+      ),
+      
       // ShellRoute digunakan agar Sidebar tetap diam, 
       // dan konten sebelah kanan saja yang berubah (Nested Navigation)
       ShellRoute(
