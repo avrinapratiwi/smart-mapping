@@ -1,0 +1,16 @@
+# ============================================================
+# Konfigurasi Apache untuk Backend API
+# Smart Mapping BPS
+# ============================================================
+# File ini memastikan URL API bisa diakses dengan benar
+# melalui Laragon atau XAMPP.
+
+# Aktifkan Rewrite Engine
+RewriteEngine On
+
+# Izinkan akses langsung ke file yang ada (PHP, gambar, dll)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Redirect semua request lain ke index (opsional untuk masa depan)
+# RewriteRule ^(.*)$ index.php?url=$1 [QSA,L]
