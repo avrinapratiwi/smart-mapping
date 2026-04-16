@@ -41,6 +41,7 @@ dependencies:
   flutter_map_marker_cluster: ^8.1.0  # Clustering marker untuk PetaDashboard
   flutter_bloc: ^9.1.1
   geolocator: ^14.0.2
+  shared_preferences: ^2.5.5
 
 dev_dependencies:
   flutter_test:

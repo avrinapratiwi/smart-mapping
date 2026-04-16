@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import '../auth/auth_bloc.dart';
 
 import '../../features/dashboard/dashboard_page.dart';
 import '../../features/direktori_usaha/direktori_usaha.dart';
@@ -17,6 +19,25 @@ class RuteAplikasi {
     navigatorKey: _rootNavigatorKey,
     // Rute awal yang dibuka
     initialLocation: '/login',
+    redirect: (context, state) {
+      final authState = context.read<AuthBloc>().state;
+      
+      final bool isGoingToLogin = state.uri.toString() == '/login' || state.uri.toString() == '/forget-password';
+      final bool isLoggedIn = authState is AuthAuthenticated;
+
+      // Jika belum login dan mencoba masuk halaman selain login -> tendang ke login
+      if (!isLoggedIn && !isGoingToLogin) {
+        return '/login';
+      }
+
+      // Jika sudah login tapi mencoba masuk ke halaman login/register -> tendang ke dashboard
+      if (isLoggedIn && isGoingToLogin) {
+        return '/dashboard';
+      }
+
+      // Biarkan rute berjalan normal
+      return null;
+    },
     routes: [
       // Rute Login (diluar ShellRoute agar tidak ada sidebar)
       GoRoute(

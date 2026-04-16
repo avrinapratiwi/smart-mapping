@@ -17,51 +17,53 @@ class DirektoriHeader extends StatelessWidget {
     final bool isFilterAktif = state is DirektoriLoaded && !state.filterSaatIni.isEmpty;
 
     return Container(
+      width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
       decoration: const BoxDecoration(
         color: Colors.white,
         border: Border(bottom: BorderSide(color: Color(0xFFE0E0E0))),
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: Wrap(
+        alignment: WrapAlignment.spaceBetween,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        spacing: 16,
+        runSpacing: 12,
         children: [
-          Expanded(
-            child: Row(
-              children: [
-                const Icon(Icons.business, color: Color(0xFFFFA500)),
-                const SizedBox(width: 8),
-                const Text(
-                  'Data Direktori Usaha',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+          Wrap(
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              const Icon(Icons.business, color: Color(0xFFFFA500)),
+              const Text(
+                'Data Direktori Usaha',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+              ),
+              if (isFilterAktif)
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.orange.shade100,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: Colors.orange.shade300),
+                  ),
+                  child: const Text(
+                    'Filter Aktif',
+                    style: TextStyle(
+                      color: Color(0xFFE65100),
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
-                if (isFilterAktif) ...[
-                  const SizedBox(width: 16),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.orange.shade100,
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: Colors.orange.shade300),
-                    ),
-                    child: const Text(
-                      'Filter Aktif',
-                      style: TextStyle(
-                        color: Color(0xFFE65100),
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ],
-              ],
-            ),
+            ],
           ),
           ElevatedButton.icon(
             onPressed: onOpenFilter,

@@ -264,10 +264,11 @@ class _BuildIsiDialog extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Identitas & Badge
-                Row(
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 8,
                   children: [
                     _buildBadge('IDSBR', usaha.idsbr, Icons.tag_rounded, Colors.grey.shade700),
-                    const SizedBox(width: 12),
                     if (usaha.skalaUsaha.isNotEmpty)
                       _buildBadge('Skala', usaha.skalaUsaha, Icons.business_center_rounded, const Color(0xFF1976D2)),
                   ],
@@ -340,8 +341,10 @@ class _BuildIsiDialog extends StatelessWidget {
               ),
               border: Border(top: BorderSide(color: Colors.grey.shade200)),
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+            child: Wrap(
+              alignment: WrapAlignment.end,
+              spacing: 12,
+              runSpacing: 8,
               children: [
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(),
@@ -350,7 +353,6 @@ class _BuildIsiDialog extends StatelessWidget {
                   ),
                   child: const Text('Tutup', style: TextStyle(fontWeight: FontWeight.bold)),
                 ),
-                const SizedBox(width: 12),
                 ElevatedButton.icon(
                   onPressed: usaha.punyaKoordinat
                       ? () {

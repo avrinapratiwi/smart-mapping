@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'core/rute/rute_aplikasi.dart';
+import 'core/auth/auth_bloc.dart';
 
 Future<void> main() async {
   // 1. Pastikan binding Flutter sudah siap
@@ -14,7 +16,9 @@ class AplikasiSmartMapping extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
+    return BlocProvider(
+      create: (context) => AuthBloc()..add(CheckAuthStatus()),
+      child: MaterialApp.router(
       title: 'Smart Mapping SE2026',
       debugShowCheckedModeBanner: false,
       // Tetap menggunakan konfigurasi router kamu
@@ -25,6 +29,7 @@ class AplikasiSmartMapping extends StatelessWidget {
         primarySwatch: Colors.orange,
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.orange),
       ),
-    );
+    ),
+  );
   }
 }

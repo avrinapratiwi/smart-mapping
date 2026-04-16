@@ -57,17 +57,47 @@ class _DashboardPageState extends State<DashboardPage> {
           padding: _isMapMaximized
               ? EdgeInsets.zero
               : const EdgeInsets.fromLTRB(28, 24, 28, 24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (!_isMapMaximized) ...[
-                _buildHeader(),
-                const SizedBox(height: 20),
-                _buildStatCards(),
-                const SizedBox(height: 20),
-              ],
-              Expanded(child: _buildMapCard()),
-            ],
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final isMobile = MediaQuery.of(context).size.width < 600;
+              final bool isTablet = MediaQuery.of(context).size.width < 1100 && !isMobile;
+
+              if (_isMapMaximized) {
+                return _buildMapCard();
+              }
+
+              if (isMobile || isTablet) {
+                // Layar kecil: buat scrollable sepenuhnya, beri tinggi peta statis agar tidak crash
+                return SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildHeader(),
+                      const SizedBox(height: 20),
+                      _buildStatCards(),
+                      const SizedBox(height: 20),
+                      SizedBox(
+                        height: 500, // Tinggi peta statis untuk mobile
+                        width: double.infinity,
+                        child: _buildMapCard(),
+                      ),
+                    ],
+                  ),
+                );
+              }
+
+              // Layar besar (Desktop): Gunakan Column & Expanded (tidak perlu scroll)
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                   _buildHeader(),
+                   const SizedBox(height: 20),
+                   _buildStatCards(),
+                   const SizedBox(height: 20),
+                   Expanded(child: _buildMapCard()),
+                ],
+              );
+            },
           ),
         ),
       ),
@@ -79,64 +109,84 @@ class _DashboardPageState extends State<DashboardPage> {
   // ════════════════════════════════════════════════════════════
 
   Widget _buildHeader() {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
+    final isMobile = MediaQuery.of(context).size.width < 600;
+
+    Widget badgeBPS = Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+      decoration: BoxDecoration(
+        color: _kOrangeLight,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: _kOrange.withOpacity(0.35)),
+      ),
+      child: const Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.bar_chart_rounded, color: _kOrange, size: 17),
+          SizedBox(width: 6),
+          Flexible(
+            child: Text(
+              'BPS Kab. Kepulauan Selayar',
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+                color: _kOrangeDark,
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
+    );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Aksen garis oranye vertikal kiri
-        Container(
-          width: 5,
-          height: 46,
-          decoration: BoxDecoration(
-            color: _kOrange,
-            borderRadius: BorderRadius.circular(4),
-          ),
-        ),
-        const SizedBox(width: 14),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Monitoring Pemetaan',
-                style: TextStyle(
-                  fontSize: 26,
-                  fontWeight: FontWeight.w800,
-                  color: _kNavy,
-                  letterSpacing: -0.5,
-                ),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            // Aksen garis oranye vertikal kiri
+            Container(
+              width: 5,
+              height: 46,
+              decoration: BoxDecoration(
+                color: _kOrange,
+                borderRadius: BorderRadius.circular(4),
               ),
-              const SizedBox(height: 3),
-              Text(
-                'Sebaran usaha berdasarkan lokasi geografis Kabupaten Kepulauan Selayar',
-                style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Monitoring Pemetaan',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w800,
+                      color: _kNavy,
+                      letterSpacing: -0.5,
+                    ),
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    'Sebaran usaha berdasarkan lokasi geografis Kabupaten Kepulauan Selayar',
+                    style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+                  ),
+                ],
               ),
+            ),
+            // Jika BUKAN mobile, tampilkan Badge BPS di kanan baris ini
+            if (!isMobile) ...[
+              const SizedBox(width: 16),
+              badgeBPS,
             ],
-          ),
+          ],
         ),
-        // Badge BPS
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
-          decoration: BoxDecoration(
-            color: _kOrangeLight,
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: _kOrange.withOpacity(0.35)),
-          ),
-          child: const Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.bar_chart_rounded, color: _kOrange, size: 17),
-              SizedBox(width: 6),
-              Text(
-                'BPS Kab. Kepulauan Selayar',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                  color: _kOrangeDark,
-                ),
-              ),
-            ],
-          ),
-        ),
+        // Jika mobile, tampilkan Badge BPS di bawah judul
+        if (isMobile) ...[
+          const SizedBox(height: 12),
+          badgeBPS,
+        ],
       ],
     );
   }
@@ -146,102 +196,128 @@ class _DashboardPageState extends State<DashboardPage> {
   // ════════════════════════════════════════════════════════════
 
   Widget _buildStatCards() {
+    final bool isTablet = MediaQuery.of(context).size.width < 1100;
+    final bool isMobile = MediaQuery.of(context).size.width < 600;
+
+    Widget card1 = _StatCard(
+      icon: Icons.badge_rounded,
+      label: 'Total Petugas',
+      value: '120',
+      warna: const Color(0xFF1976D2),
+      warnaBackground: const Color(0xFFE3F2FD),
+      trailing: _trendWidget('+5%', naik: true),
+    );
+
+    Widget card2 = BlocBuilder<DirektoriBloc, DirektoriState>(
+      builder: (context, state) {
+        String total = '—';
+        Widget? sub;
+        if (state is DirektoriLoading) {
+          total = '...';
+        } else if (state is DirektoriLoaded) {
+          total = state.totalData.toString();
+          final n = state.daftarUsaha.where((u) => u.punyaKoordinat).length;
+          sub = Text('$n ber-koordinat',
+              style: const TextStyle(
+                  fontSize: 11, color: _kOrangeDark, fontWeight: FontWeight.w600));
+        } else if (state is DirektoriError) {
+          total = '!';
+        }
+        return _StatCard(
+          icon: Icons.storefront_rounded,
+          label: 'Total Usaha',
+          value: total,
+          warna: _kOrange,
+          warnaBackground: _kOrangeLight,
+          trailing: sub,
+        );
+      },
+    );
+
+    Widget card3 = BlocBuilder<DirektoriBloc, DirektoriState>(
+      builder: (context, state) {
+        String aktif = '—';
+        Widget? badge;
+        if (state is DirektoriLoaded) {
+          aktif = state.daftarUsaha.where((u) => u.punyaKoordinat).length.toString();
+          if (!state.filterSaatIni.isEmpty) {
+            badge = Container(
+              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+              decoration: BoxDecoration(
+                color: Colors.orange,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Text('Filter ON',
+                  style: TextStyle(
+                      fontSize: 9, color: Colors.white, fontWeight: FontWeight.bold)),
+            );
+          }
+        }
+        return _StatCard(
+          icon: Icons.location_on_rounded,
+          label: 'Marker di Peta',
+          value: aktif,
+          warna: const Color(0xFF2E7D32),
+          warnaBackground: const Color(0xFFE8F5E9),
+          trailing: badge,
+        );
+      },
+    );
+
+    Widget card4 = _StatCard(
+      icon: Icons.map_rounded,
+      label: 'Kecamatan',
+      value: '11',
+      warna: const Color(0xFF6A1B9A),
+      warnaBackground: const Color(0xFFF3E5F5),
+      trailing: const Text(
+        'Kab. Kepulauan Selayar',
+        style: TextStyle(
+            fontSize: 10,
+            color: Color(0xFF6A1B9A),
+            fontWeight: FontWeight.w600),
+        overflow: TextOverflow.ellipsis,
+      ),
+    );
+
+    if (isMobile) {
+      // Pada layar mobile, gunakan grid 2x2 agar lebih ringkas
+      return Column(
+        children: [
+          Row(
+            children: [Expanded(child: card1), const SizedBox(width: 12), Expanded(child: card2)],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [Expanded(child: card3), const SizedBox(width: 12), Expanded(child: card4)],
+          ),
+        ],
+      );
+    } else if (isTablet) {
+      // Pada tablet, gunakan grid 2x2
+      return Column(
+        children: [
+          Row(
+            children: [Expanded(child: card1), const SizedBox(width: 16), Expanded(child: card2)],
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [Expanded(child: card3), const SizedBox(width: 16), Expanded(child: card4)],
+          ),
+        ],
+      );
+    }
+
+    // Default desktop: sebaris 1x4
     return Row(
       children: [
-        // Card 1 — Petugas (statis)
-        Expanded(
-          child: _StatCard(
-            icon: Icons.badge_rounded,
-            label: 'Total Petugas',
-            value: '120',
-            warna: const Color(0xFF1976D2),
-            warnaBackground: const Color(0xFFE3F2FD),
-            trailing: _trendWidget('+5%', naik: true),
-          ),
-        ),
+        Expanded(child: card1),
         const SizedBox(width: 16),
-
-        // Card 2 — Total Usaha (dari BLoC)
-        BlocBuilder<DirektoriBloc, DirektoriState>(
-          builder: (context, state) {
-            String total = '—';
-            Widget? sub;
-            if (state is DirektoriLoading) {
-              total = '...';
-            } else if (state is DirektoriLoaded) {
-              total = state.totalData.toString();
-              final n = state.daftarUsaha.where((u) => u.punyaKoordinat).length;
-              sub = Text('$n ber-koordinat',
-                  style: const TextStyle(
-                      fontSize: 11, color: _kOrangeDark, fontWeight: FontWeight.w600));
-            } else if (state is DirektoriError) {
-              total = '!';
-            }
-            return Expanded(
-              child: _StatCard(
-                icon: Icons.storefront_rounded,
-                label: 'Total Usaha',
-                value: total,
-                warna: _kOrange,
-                warnaBackground: _kOrangeLight,
-                trailing: sub,
-              ),
-            );
-          },
-        ),
+        Expanded(child: card2),
         const SizedBox(width: 16),
-
-        // Card 3 — Marker Aktif (reaktif terhadap filter)
-        BlocBuilder<DirektoriBloc, DirektoriState>(
-          builder: (context, state) {
-            String aktif = '—';
-            Widget? badge;
-            if (state is DirektoriLoaded) {
-              aktif = state.daftarUsaha.where((u) => u.punyaKoordinat).length.toString();
-              if (!state.filterSaatIni.isEmpty) {
-                badge = Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
-                  decoration: BoxDecoration(
-                    color: Colors.orange,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: const Text('Filter ON',
-                      style: TextStyle(
-                          fontSize: 9, color: Colors.white, fontWeight: FontWeight.bold)),
-                );
-              }
-            }
-            return Expanded(
-              child: _StatCard(
-                icon: Icons.location_on_rounded,
-                label: 'Marker di Peta',
-                value: aktif,
-                warna: const Color(0xFF2E7D32),
-                warnaBackground: const Color(0xFFE8F5E9),
-                trailing: badge,
-              ),
-            );
-          },
-        ),
+        Expanded(child: card3),
         const SizedBox(width: 16),
-
-        // Card 4 — Kecamatan (statis)
-        Expanded(
-          child: _StatCard(
-            icon: Icons.map_rounded,
-            label: 'Kecamatan',
-            value: '11',
-            warna: const Color(0xFF6A1B9A),
-            warnaBackground: const Color(0xFFF3E5F5),
-            trailing: const Text(
-              'Kab. Kepulauan Selayar',
-              style: TextStyle(
-                  fontSize: 10,
-                  color: Color(0xFF6A1B9A),
-                  fontWeight: FontWeight.w600),
-            ),
-          ),
-        ),
+        Expanded(child: card4),
       ],
     );
   }

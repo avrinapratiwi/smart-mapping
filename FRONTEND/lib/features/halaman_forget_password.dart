@@ -38,6 +38,9 @@ class _HalamanForgetPasswordState extends State<HalamanForgetPassword> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth < 600;
+
     return Scaffold(
       backgroundColor: Colors.grey[200],
       body: Center(
@@ -45,11 +48,11 @@ class _HalamanForgetPasswordState extends State<HalamanForgetPassword> {
           behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
           child: SingleChildScrollView(
             child: Padding(
-              padding: const EdgeInsets.all(24.0),
+              padding: EdgeInsets.all(isMobile ? 16.0 : 24.0),
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 550),
                 child: Container(
-                  padding: const EdgeInsets.all(40),
+                  padding: EdgeInsets.all(isMobile ? 24.0 : 40.0),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(24),
